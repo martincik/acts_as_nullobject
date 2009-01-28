@@ -1,0 +1,70 @@
+Acts as NullObject
+================
+Autor: Ladislav Martincik (ladislav.martincik@gmail.com)
+
+= Description
+Aim is to provide Null Object pattern for Rails models and relations (mainly belongs_to) on the fly.
+Have a look at:
+- http://en.wikipedia.org/wiki/Null_object_pattern
+- http://blog.craigambrose.com/past/2006/9/22/active-record-associations-and-the-null-object-pattern/
+- http://www.answers.com/null+object+pattern?cat=technology&gwp=13
+
+
+= Requirements:
+ GEMs:
+  - rspec - Testing framework
+  - hpricot - HTTP/XML parser
+  - sqlite3-ruby - Sqlite database connector for Ruby
+  
+= Installation
+Copy acts_as_nullobject directory tree to your RAILS_ROOT/vendor/plugins.
+
+= Provides methods
+ - acts_as_nullobject(initial_data = {})
+ - belongs_to_with_nullobject(association, options = {})
+
+= Run tests
+Just type inside plugin directory "rake".
+
+= Basic usage
+
+class User < ActiveRecord::Base
+  acts_as_nullobject :login => 'lacomartincik'
+end
+
+With this you can use method called "null_object" which will return NullUser object:
+
+irb> User.null_object
+=> NullUser
+
+= Belongs to usage
+
+class Role < ActiveRecord::Base
+  belongs_to_with_nullobject :user
+end
+
+irb> r = Role.new
+irb> r.user # which is nil and we want to return NullRole object instead
+=> NullRole
+
+= Enabling/Disabling NullObject
+
+For class:
+class User < ActiveRecord::Base
+  acts_as_nullobject :login => 'laco'
+end
+
+Disabling null object is:
+User.disable_null_object
+
+Enabling null object is:
+User.enable_null_object
+
+Here's example from RSpec test:
+CompanyCar.disable_null_object
+@company_car = CompanyCar.new(:name => 'Test1', :account_id => 1, :company => nil)
+@company_car.company.should be_nil
+CompanyCar.enable_null_object
+@company_car = CompanyCar.new(:name => 'Test1', :account_id => 1, :company => nil)
+@company_car.company.should be_instance_of(NullCompany)
+
